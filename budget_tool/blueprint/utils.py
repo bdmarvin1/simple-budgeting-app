@@ -33,6 +33,50 @@ def get_kansas_tax_deadlines():
         {"date": "Apr 15", "event": "Kansas State Tax"},
     ]
 
+def process_recurring_transactions():
+    """Check for due recurring transactions and create entries."""
+    today = datetime.utcnow().date()
+    recurring_items = RecurringTransaction.query.filter(RecurringTransaction.next_date <= today).all()
+
+    for item in recurring_items:
+        while item.next_date <= today:
+            # Create transaction
+            new_t = Transaction(
+                date=item.next_date,
+                description=f"{item.description} (Recurring)",
+                amount=item.amount,
+                category=item.category,
+                is_pass_through=item.is_pass_through
+            )
+            if item.projects:
+                new_t.projects = item.projects
+
+            db.session.add(new_t)
+
+            # Update next date
+            if item.frequency == 'MONTHLY':
+                # Simple month increment
+                month = item.next_date.month
+                year = item.next_date.year + (month // 12)
+                month = (month % 12) + 1
+                try:
+                    item.next_date = item.next_date.replace(year=year, month=month)
+                except ValueError:
+                    # Handle last day of month issues
+                    # If 31st isn't in next month, use last day of next month
+                    import calendar
+                    last_day = calendar.monthrange(year, month)[1]
+                    item.next_date = item.next_date.replace(year=year, month=month, day=last_day)
+            elif item.frequency == 'WEEKLY':
+                item.next_date += timedelta(weeks=1)
+            elif item.frequency == 'ANNUAL':
+                item.next_date = item.next_date.replace(year=item.next_date.year + 1)
+
+            # Commit inside loop to avoid skipping if one fails?
+            # Better to commit all at once at the end.
+
+    db.session.commit()
+
 def get_forecast_data():
     """Generate 13-week forecast data."""
     weeks = []

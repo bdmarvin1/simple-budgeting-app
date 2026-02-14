@@ -5,7 +5,10 @@ from flask import render_template, request, redirect, url_for, session, flash, c
 from werkzeug.security import check_password_hash
 from . import budget_bp
 from .models import db, Transaction, Project, TimeEntry, RecurringTransaction, Asset
-from .utils import login_required, calculate_agi, get_kansas_tax_deadlines, get_forecast_data
+from .utils import (
+    login_required, calculate_agi, get_kansas_tax_deadlines,
+    get_forecast_data, process_recurring_transactions
+)
 from datetime import datetime, timedelta
 from decimal import Decimal
 from sqlalchemy import func
@@ -36,6 +39,7 @@ def inject_now():
 @budget_bp.route('/')
 @login_required
 def dashboard():
+    process_recurring_transactions()
     transactions = Transaction.query.order_by(Transaction.date.desc()).limit(10).all()
     agi = calculate_agi()
     deadlines = get_kansas_tax_deadlines()
@@ -170,13 +174,14 @@ def add_recurring():
     category = request.form.get('category')
     frequency = request.form.get('frequency')
     is_pass_through = 'is_pass_through' in request.form
+    create_immediate = 'create_immediate' in request.form
     next_date_str = request.form.get('next_date')
     project_ids = request.form.getlist('project_ids')
 
     next_date = datetime.strptime(next_date_str, '%Y-%m-%d').date()
 
     # Ensure sign matches category
-    if category == 'Income (Retainer)':
+    if category == 'Income':
         amount = abs(amount)
     else:
         amount = -abs(amount)
@@ -196,6 +201,10 @@ def add_recurring():
 
     db.session.add(new_recurring)
     db.session.commit()
+
+    if create_immediate:
+        from .utils import process_recurring_transactions
+        process_recurring_transactions()
 
     flash('Recurring transaction added.', 'success')
     return redirect(url_for('budget.recurring'))

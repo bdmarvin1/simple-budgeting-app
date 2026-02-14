@@ -29,7 +29,7 @@
                 <select name="category" class="w-full px-4 py-3 rounded-xl border border-zinc-300 focus:ring-2 focus:ring-zinc-500 outline-none">
                     <option value="Software">Software (SaaS)</option>
                     <option value="Payroll">Payroll</option>
-                    <option value="Income (Retainer)">Income (Retainer)</option>
+                    <option value="Income">Income</option>
                     <option value="Marketing">Marketing</option>
                     <option value="Other">Other</option>
                 </select>
@@ -61,10 +61,17 @@
             </div>
         </div>
 
-        <div class="flex items-center space-x-3 py-2">
-            <input type="checkbox" id="is_pass_through" name="is_pass_through"
-                   class="w-5 h-5 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-500">
-            <label for="is_pass_through" class="text-sm font-medium text-zinc-700">Pass-Through Expense</label>
+        <div class="space-y-3 py-2">
+            <div class="flex items-center space-x-3">
+                <input type="checkbox" id="is_pass_through" name="is_pass_through"
+                       class="w-5 h-5 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-500">
+                <label for="is_pass_through" class="text-sm font-medium text-zinc-700">Pass-Through Expense</label>
+            </div>
+            <div class="flex items-center space-x-3">
+                <input type="checkbox" id="create_immediate" name="create_immediate"
+                       class="w-5 h-5 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-500">
+                <label for="create_immediate" class="text-sm font-medium text-zinc-700">Log first entry <span class="font-bold">NOW</span> (and set next date based on frequency)</label>
+            </div>
         </div>
 
         <button type="submit"
@@ -90,8 +97,8 @@
             <p class="text-xs text-zinc-400 mt-2">Next: {{ item.next_date.strftime('%b %d, %Y') }}</p>
         </div>
         <div class="text-right">
-            <p class="text-xl font-bold {% if item.category == 'Income (Retainer)' %}text-emerald-600{% else %}text-zinc-900{% endif %}">
-                {% if item.category == 'Income (Retainer)' %}+{% else %}-{% endif %}${{ "%.2f"|format(item.amount|abs) }}
+            <p class="text-xl font-bold {% if item.category == 'Income' %}text-emerald-600{% else %}text-zinc-900{% endif %}">
+                {% if item.category == 'Income' %}+{% else %}-{% endif %}${{ "%.2f"|format(item.amount|abs) }}
             </p>
             <form action="{{ url_for('budget.delete_recurring', id=item.id) }}" method="POST" onsubmit="return confirm('Delete this recurring item?')">
                 <button type="submit" class="text-xs text-red-400 hover:text-red-600 font-medium mt-2">Delete</button>
