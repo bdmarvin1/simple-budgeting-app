@@ -175,6 +175,12 @@ def add_recurring():
 
     next_date = datetime.strptime(next_date_str, '%Y-%m-%d').date()
 
+    # Ensure sign matches category
+    if category == 'Income (Retainer)':
+        amount = abs(amount)
+    else:
+        amount = -abs(amount)
+
     new_recurring = RecurringTransaction(
         description=description,
         amount=amount,
@@ -303,6 +309,12 @@ def save_import():
             project_ids = request.form.getlist(f'project_ids_{i}')
 
             try:
+                # Ensure sign matches category
+                if category == 'Income':
+                    amount = abs(amount)
+                else:
+                    amount = -abs(amount)
+
                 # Try common date formats
                 date = None
                 for fmt in ('%Y-%m-%d', '%m/%d/%Y', '%d/%m/%Y'):
@@ -344,6 +356,13 @@ def add_transaction():
 
     try:
         amount = Decimal(amount_str)
+
+        # Ensure sign matches category
+        if category == 'Income':
+            amount = abs(amount)
+        else:
+            amount = -abs(amount)
+
         date = datetime.strptime(date_str, '%Y-%m-%d').date()
 
         new_transaction = Transaction(
