@@ -1,0 +1,91 @@
+{% extends "budget/base.html" %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <!-- AGI Gauge -->
+    {% include "budget/partials/agi_gauge.html" %}
+
+    <!-- Next Deadline -->
+    <div class="bg-zinc-900 text-white p-6 rounded-2xl shadow-sm">
+        <h3 class="text-zinc-400 text-sm font-medium uppercase tracking-wider mb-4">Upcoming Tax Deadlines</h3>
+        <ul class="space-y-3">
+            {% for deadline in deadlines[:2] %}
+            <li class="flex justify-between items-center text-sm">
+                <span class="text-zinc-400">{{ deadline.date }}</span>
+                <span class="font-medium">{{ deadline.event }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- Add Transaction Form -->
+<div class="bg-white p-6 rounded-2xl border border-zinc-200 shadow-sm mb-8">
+    <h3 class="text-lg font-bold text-zinc-800 mb-6">Log Transaction</h3>
+    <form hx-post="{{ url_for('budget.add_transaction') }}"
+          hx-target="#transaction-list-container"
+          hx-swap="innerHTML"
+          hx-on::after-request="if(event.detail.successful) this.reset()"
+          class="space-y-4">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-zinc-700 mb-1">Description</label>
+                <input type="text" name="description" required placeholder="e.g. Client Monthly Retainer"
+                       class="w-full px-4 py-3 rounded-xl border border-zinc-300 focus:ring-2 focus:ring-zinc-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-zinc-700 mb-1">Amount</label>
+                <input type="number" step="0.01" name="amount" required placeholder="0.00"
+                       class="w-full px-4 py-3 rounded-xl border border-zinc-300 focus:ring-2 focus:ring-zinc-500 outline-none">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-zinc-700 mb-1">Date</label>
+                <input type="date" name="date" required value="{{ now_date }}"
+                       class="w-full px-4 py-3 rounded-xl border border-zinc-300 focus:ring-2 focus:ring-zinc-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-zinc-700 mb-1">Category</label>
+                <select name="category" class="w-full px-4 py-3 rounded-xl border border-zinc-300 focus:ring-2 focus:ring-zinc-500 outline-none">
+                    <option value="Income">Income</option>
+                    <option value="Software">Software (SaaS)</option>
+                    <option value="Payroll">Payroll</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-3 py-2">
+            <input type="checkbox" id="is_pass_through" name="is_pass_through"
+                   class="w-5 h-5 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-500">
+            <label for="is_pass_through" class="text-sm font-medium text-zinc-700">Pass-Through Expense (Subtract from AGI)</label>
+        </div>
+
+        <button type="submit"
+                class="w-full bg-zinc-800 text-white font-semibold py-3 rounded-xl hover:bg-zinc-700 transition flex justify-center items-center">
+            <span class="htmx-indicator mr-2">
+                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </span>
+            Save Transaction
+        </button>
+    </form>
+</div>
+
+<!-- Ledger -->
+<div class="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-zinc-100 flex justify-between items-center">
+        <h3 class="text-lg font-bold text-zinc-800">Transaction Ledger</h3>
+    </div>
+
+    <div id="transaction-list-container">
+        {% include "budget/partials/transaction_list.html" %}
+    </div>
+</div>
+{% endblock %}

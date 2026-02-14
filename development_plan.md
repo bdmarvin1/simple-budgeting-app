@@ -18,13 +18,13 @@ Project: id, name, monthly_retainer, status (Fixed to 'ACTIVE').
 
 AGI Logic: AGI = Total Revenue - (Sum of Pass-Through Transactions).
 
-2. Phase 1: Blueprint Foundation & Mobile Security
+2. Phase 1: Blueprint Foundation & Mobile Security [DONE]
 
-Secure Entry: Protect all /admin/budget routes with the existing site authentication (Founder-only).
+Secure Entry: Protect all /admin/budget routes with the existing site authentication (Founder-only). [DONE]
 
-Mobile-First Layout: Use a clean, thumb-friendly Tailwind CSS layout.
+Mobile-First Layout: Use a clean, thumb-friendly Tailwind CSS layout. [DONE]
 
-Manual Entry Ledger: A fast-loading form to log every expense and income item. This is the "Primary Source of Truth."
+Manual Entry Ledger: A fast-loading form to log every expense and income item. This is the "Primary Source of Truth." [DONE]
 
 3. Phase 3: Time Tracking (AppSheet Migration)
 
