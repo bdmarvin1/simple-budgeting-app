@@ -1,57 +1,32 @@
-Development Plan: KC Local SEO Financial Blueprint (Flask Edition)
+# KC Local SEO Financial Blueprint - Development Plan
 
-1. Core Architecture (The Isolated "Clean" Financials)
+## Phase 1: Foundation & Project Ledger (COMPLETED)
+- [x] **Project CRUD**: Create, Read, Update projects.
+- [x] **Time Tracking**: Log hours per project with live AHR (Average Hourly Rate) feedback.
+- [x] **Core Ledger**: Central transaction list with Income vs. Expense categorization.
+- [x] **Sign Consistency**: Income is positive (+), Expenses (Software, Payroll, etc.) are negative (-).
 
-Integration: To be built as a Flask Blueprint registered at /admin/budget.
+## Phase 2: AGI & Margin Logic (COMPLETED)
+- [x] **AGI Calculation**: (Total Revenue) - (Pass-Through Expenses).
+- [x] **Delivery Margin**: Per-project profitability based on (Retainer - Internal Labor Cost).
+- [x] **Project Status**: ACTIVE, COMPLETED, CANCELLED filtering.
 
-Database (Dedicated SQLite/MySQL):
+## Phase 3: Financial Forecasting (COMPLETED)
+- [x] **13-Week Cash Forecast**: Rolling chart accounting for retainers and recurring templates.
+- [x] **Recurring Templates**: Auto-generate ledger entries based on frequency (Weekly, Monthly, Annual).
+- [x] **Sign Prefixes**: Enforce visual +/- in all ledger views.
 
-Clean Start: Initialize a fresh database schema specifically for financials to avoid entanglement with main site user data.
+## Phase 4: Compliance & Advanced Tools (COMPLETED)
+- [x] **Asset Ledger**: Kansas Personal Property Tax compliance (> $1,500 threshold flagging).
+- [x] **Tax Deadline Tracker**: Visual countdown to Jan 31 (W2/1099) and March 15 (Property Rendition).
+- [x] **Software ROI**: Efficiency analysis of SaaS spend vs. supported AGI.
 
-Models:
+## Phase 5: Data Management & Refinement (COMPLETED)
+- [x] **CSV Import**: Manual review stage for bulk uploading bank/card transactions.
+- [x] **HTMX Interactions**: No-refresh additions for time logs and transactions.
+- [x] **Zinc/Slate Theme**: Clean, professional, "anxiety-free" mobile-first UI.
 
-Transaction: id, date, description, amount, category, is_pass_through (Boolean).
-
-TimeEntry: id, date, hours (Decimal/Float), description, project_id.
-
-Project: id, name, monthly_retainer, status (Fixed to 'ACTIVE').
-
-AGI Logic: AGI = Total Revenue - (Sum of Pass-Through Transactions).
-
-2. Phase 1: Blueprint Foundation & Mobile Security [DONE]
-
-Secure Entry: Protect all /admin/budget routes with the existing site authentication (Founder-only). [DONE]
-
-Mobile-First Layout: Use a clean, thumb-friendly Tailwind CSS layout. [DONE]
-
-Manual Entry Ledger: A fast-loading form to log every expense and income item. This is the "Primary Source of Truth." [DONE]
-
-3. Phase 3: Time Tracking (AppSheet Migration)
-
-Log Hours: A simple decimal input for hours (e.g., 0.5, 1.75).
-
-Active Projects Only: Dropdowns must strictly filter for 'ACTIVE' status projects.
-
-Live AHR Calculation: Show the "Average Hourly Rate" ($Retainer / TotalHours$) for the project immediately upon saving a time entry via HTMX.
-
-4. Phase 4: The "Anxiety-Free" Dashboard
-
-Theme: Neutral palette (Zinc/Slate) to keep things calm. Use Red only for "Danger" zones (Margin < 50%).
-
-KPI Display: - AGI Gauge: The big number.
-
-Delivery Margin: Per-project profitability.
-
-13-Week Cash Forecast: A predictive chart (Chart.js) showing upcoming retainers vs. known software/payroll costs.
-
-5. Phase 5: Kansas Compliance & Asset Tracking
-
-Asset Ledger: Specifically for tracking equipment >$1,500 for the March 15 Personal Property Rendition.
-
-Tax Calendar: A persistent widget showing the next 2026 Kansas deadline (e.g., Mar 16 S-Corp, Apr 15 K-120S).
-
-Software ROI: A view to see which SaaS tools are actually "earning their keep" based on AGI.
-
-6. Phase 6: CSV Import (Flexibility)
-
-Mapping Engine: Allow for uploading CSV statements. Start with a generic mapper for "Date, Desc, Amount" and flag imports as "Pending Review" until a manual is_pass_through check is done.
+## Phase 6: Final Polish (COMPLETED)
+- [x] **Project Summary View**: Main projects list shows net totals.
+- [x] **Project Details Page**: Focused view for historical ledger and recurring links.
+- [x] **Documentation**: Comprehensive README and completed plan.
