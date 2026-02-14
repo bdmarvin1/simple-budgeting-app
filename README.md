@@ -29,31 +29,51 @@ A dedicated financial management and forecasting tool for KC Local SEO, built as
 - **Frontend**: Tailwind CSS, HTMX, Jinja2, Chart.js
 - **Security**: Werkzeug password hashing, environment-based configuration.
 
-## Setup Instructions
+## Installation & Setup
 
+### Option 1: Standalone Runner (Quick Start)
 1. **Install Dependencies**:
    ```bash
    pip install -r budget_tool/requirements.txt
    ```
-
 2. **Configuration**:
-   Copy `.env.example` to `.env` and set your `FLASK_SECRET_KEY` and `ADMIN_PASSWORD_HASH`.
-   You can generate a password hash using:
-   ```bash
-   python budget_tool/hash_password.py yourpassword
-   ```
-
-3. **Initialize Database**:
-   The database will be automatically initialized on first run.
-
-4. **Run Application**:
-   To run as a standalone service:
+   Copy `budget_tool/.env.example` to `budget_tool/.env` and set your `FLASK_SECRET_KEY` and `ADMIN_PASSWORD_HASH`.
+3. **Run**:
    ```bash
    python budget_tool/run_standalone.py
    ```
-   Access the dashboard at `http://127.0.0.1:5000/admin/budget`.
+   Access at `http://127.0.0.1:5000/admin/budget`.
+
+### Option 2: Integrate into Existing Flask App
+To add this tool to your existing site:
+
+1. **Copy the Blueprint**:
+   Ensure the `budget_tool/blueprint` directory is in your project.
+
+2. **Register the Blueprint**:
+   In your app factory or main `app.py`:
+   ```python
+   from budget_tool.blueprint import budget_bp, db as budget_db
+
+   app = Flask(__name__)
+
+   # Initialize the budget database (uses its own instance)
+   budget_db.init_app(app)
+
+   # Register the blueprint at your preferred prefix
+   app.register_blueprint(budget_bp, url_prefix='/admin/budget')
+   ```
+
+3. **Required Environment Variables**:
+   Ensure your main app's `.env` includes:
+   - `ADMIN_PASSWORD_HASH`: Scrypt hash for dashboard access.
+   - `DATABASE_URL`: Path to the budget SQLite file (e.g., `sqlite:///budget.db`).
+
+4. **Initialize Models**:
+   Run `db.create_all()` within the app context to create the required budget tables.
 
 ## Development Logic
 - **Signage**: Income is always stored and displayed as positive (+). Expenses (Payroll, Software, etc.) are stored as negative (-) but displayed with absolute values and appropriate coloring (Zinc/Black).
 - **Pass-Throughs**: Expenses flagged as "Pass-Through" are deducted from Total Revenue to calculate AGI.
+- **Split Accounting**: Transactions linked to multiple projects are split equally among them for all project-specific financial reporting and margin calculations.
 - **Assets**: Kansas-specific logic flags any individual asset with a value > $1,500.

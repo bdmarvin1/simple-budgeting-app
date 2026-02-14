@@ -76,7 +76,8 @@ def projects():
 
     project_totals = {}
     for p in projects_list:
-        total = sum(t.amount for t in p.transactions)
+        # Split transactions equally among linked projects
+        total = sum(t.amount / len(t.projects) for t in p.transactions) if p.transactions else Decimal('0')
         project_totals[p.id] = total
 
     return render_template('budget/projects.html', projects=projects_list, show_inactive=show_inactive, project_totals=project_totals)
@@ -86,11 +87,12 @@ def projects():
 def project_details(id):
     project = Project.query.get_or_404(id)
 
-    total_income = sum(t.amount for t in project.transactions if t.amount > 0)
-    total_expenses = sum(abs(t.amount) for t in project.transactions if t.amount < 0)
+    # Split transactions equally among linked projects
+    total_income = sum(t.amount / len(t.projects) for t in project.transactions if t.amount > 0)
+    total_expenses = sum(abs(t.amount) / len(t.projects) for t in project.transactions if t.amount < 0)
     net_total = total_income - total_expenses
 
-    # Calculate margin based on transactions
+    # Calculate margin based on split transactions
     margin = (total_income - total_expenses) / total_income * 100 if total_income > 0 else 0
 
     # Get linked recurring items
