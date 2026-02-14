@@ -74,7 +74,37 @@ def projects():
     else:
         projects_list = Project.query.filter_by(status='ACTIVE').all()
 
-    return render_template('budget/projects.html', projects=projects_list, show_inactive=show_inactive)
+    project_totals = {}
+    for p in projects_list:
+        total = sum(t.amount for t in p.transactions)
+        project_totals[p.id] = total
+
+    return render_template('budget/projects.html', projects=projects_list, show_inactive=show_inactive, project_totals=project_totals)
+
+@budget_bp.route('/projects/<int:id>')
+@login_required
+def project_details(id):
+    project = Project.query.get_or_404(id)
+
+    total_income = sum(t.amount for t in project.transactions if t.amount > 0)
+    total_expenses = sum(abs(t.amount) for t in project.transactions if t.amount < 0)
+    net_total = total_income - total_expenses
+
+    # Calculate margin based on transactions
+    margin = (total_income - total_expenses) / total_income * 100 if total_income > 0 else 0
+
+    # Get linked recurring items
+    recurring_items = project.recurring_transactions
+
+    return render_template(
+        'budget/project_details.html',
+        project=project,
+        total_income=total_income,
+        total_expenses=total_expenses,
+        net_total=net_total,
+        margin=margin,
+        recurring_items=recurring_items
+    )
 
 @budget_bp.route('/projects/add', methods=['POST'])
 @login_required
@@ -106,7 +136,7 @@ def update_project(id):
 
     db.session.commit()
     flash(f'Project "{project.name}" updated.', 'success')
-    return redirect(url_for('budget.projects'))
+    return redirect(url_for('budget.project_details', id=project.id))
 
 @budget_bp.route('/time-tracking')
 @login_required
