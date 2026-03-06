@@ -1,6 +1,6 @@
 # KC Local SEO Financial Blueprint
 
-A dedicated financial management and forecasting tool for KC Local SEO, built as a standalone Flask Blueprint. This tool provides "anxiety-free" financial clarity, focusing on Agency Gross Income (AGI), project profitability, and tax compliance.
+A dedicated financial management and forecasting tool for KC Local SEO, built as a specialized Flask Blueprint. This tool provides "anxiety-free" financial clarity, focusing on Agency Gross Income (AGI), project profitability, and tax compliance. Optimized for mobile-first management with Zinc/Slate/Neutral tones.
 
 ## Key Features
 
@@ -21,7 +21,7 @@ A dedicated financial management and forecasting tool for KC Local SEO, built as
 
 ### 4. Data Entry & UX
 - **CSV Import**: Bulk upload transactions with a manual review/categorization stage.
-- **Mobile First**: Zinc/Slate/Neutral color palette optimized for thumb-driven use.
+- **Mobile First**: Optimized for thumb-driven use with Tailwind CSS.
 - **HTMX Powered**: Seamless, no-refresh interactions for all data entry.
 
 ## Tech Stack
@@ -34,26 +34,27 @@ A dedicated financial management and forecasting tool for KC Local SEO, built as
 ### Option 1: Standalone Runner (Quick Start)
 1. **Install Dependencies**:
    ```bash
-   pip install -r budget_tool/requirements.txt
+   pip install -r budget_requirements.txt
    ```
 2. **Configuration**:
-   Copy `budget_tool/.env.example` to `budget_tool/.env` and set your `FLASK_SECRET_KEY` and `ADMIN_PASSWORD_HASH`.
+   Copy `.env.example` to `.env` and set your `FLASK_SECRET_KEY` and `ADMIN_PASSWORD_HASH`.
+   - **Generate a password hash**:
+     ```bash
+     python hash_password.py your_password
+     ```
 3. **Run**:
    ```bash
-   python budget_tool/run_standalone.py
+   python run_standalone.py
    ```
    Access at `http://127.0.0.1:5000/admin/budget`.
 
 ### Option 2: Integrate into Existing Flask App
 To add this tool to your existing site:
 
-1. **Copy the Blueprint**:
-   Ensure the `budget_tool/blueprint` directory is in your project.
-
-2. **Register the Blueprint**:
+1. **Register the Blueprint**:
    In your app factory or main `app.py`:
    ```python
-   from budget_tool.blueprint import budget_bp, db as budget_db
+   from blueprint import budget_bp, db as budget_db
 
    app = Flask(__name__)
 
@@ -64,12 +65,12 @@ To add this tool to your existing site:
    app.register_blueprint(budget_bp, url_prefix='/admin/budget')
    ```
 
-3. **Required Environment Variables**:
+2. **Required Environment Variables**:
    Ensure your main app's `.env` includes:
-   - `ADMIN_PASSWORD_HASH`: Scrypt hash for dashboard access.
+   - `ADMIN_PASSWORD_HASH`: Hash for dashboard access (use `hash_password.py`).
    - `DATABASE_URL`: Path to the budget SQLite file (e.g., `sqlite:///budget.db`).
 
-4. **Initialize Models**:
+3. **Initialize Models**:
    Run `db.create_all()` within the app context to create the required budget tables.
 
 ## Development Logic
@@ -77,3 +78,9 @@ To add this tool to your existing site:
 - **Pass-Throughs**: Expenses flagged as "Pass-Through" are deducted from Total Revenue to calculate AGI.
 - **Split Accounting**: Transactions linked to multiple projects are split equally among them for all project-specific financial reporting and margin calculations.
 - **Assets**: Kansas-specific logic flags any individual asset with a value > $1,500.
+
+## Directory Structure
+- `blueprint/`: The core logic, models, and templates of the budget tool.
+- `hash_password.py`: Utility to generate the secure password hash.
+- `run_standalone.py`: Test runner for local development.
+- `budget_requirements.txt`: Necessary Python packages for the budget tool.
